@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+    <title>Student Result Portal</title>
+    <style>
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh; /* Changed from height to min-height to fix the stretching */
+            margin: 0;
+            padding: 20px 10px;
+            box-sizing: border-box;
+            background: linear-gradient(blue, white);
+            font-family: sans-serif;
+        }
+
+        h1 {
+            font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+            color: white;
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+        }
+
+        h2 {
+            color: purple;
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.2rem;
+        }
+
+        /* Inputs layout container */
+        #myinput {
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: skyblue;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button.enter-btn {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 600px; /* Prevents text elements from crushing together */
+            font-size: 12px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #fff;
+            padding: 8px;
+            text-align: center;
+        }
+
+        tr {
+            background: SkyBlue;
+            color: blue;
+            font-weight: 900;
+        }
+
+        th {
+            background-color: navy;
+            color: white;
+        }
+        
+        .clear-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>SEVENTHDAY ADVENTIST SCHOOL AGODI GATE</h1>
+    <h2>Student Result Portal</h2>
+    
+    
+    <div id="myinput"> 
+        <input type="text" id="fullname" placeholder="Student Full Name" required>
+        <input type="number" id="numberone" placeholder="Test Score" required>
+        <input type="number" id="numbertwo" placeholder="Exam Score" required>
+        <button class="enter-btn" onclick="checkme()">Enter</button>
+    </div>
+
+    
+    <div class="table-container">
+        <table id="mytable">
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Fullname</th>
+                    <th>Test</th>
+                    <th>Examination</th>
+                    <th>Sum</th>
+                    <th>Average</th>
+                    <th>Percentage</th>
+                    <th>Position</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="fill"></tbody>
+        </table>
+    </div>
+      
+    <script>
+        
+        let counter = 1;
+
+        window.onload = function() {
+            let savedData = localStorage.getItem("studentResults");
+            if (savedData) {
+                document.getElementById("fill").innerHTML = savedData;
+                // Read current row count to resume proper S/N numbering sequence
+                let rows = document.getElementById("fill").rows;
+                if(rows.length > 0) {
+                    counter = rows.length + 1;
+                }
+            }
+        };
+
+        function checkme(){
+            let fullname = document.getElementById("fullname").value;
+            let testValue = document.getElementById("numberone").value;
+            let examValue = document.getElementById("numbertwo").value;
+
+            
+            if(!fullname || !testValue || !examValue) {
+                alert("Please fill out all input boxes first.");
+                return;
+            }
+
+            let test = parseFloat(testValue);
+            let exam = parseFloat(examValue);
+            let sum = test + exam;
+            let position = "N/A";
+            let average = sum / 2;
+            let percentage = sum / 100;
+            
+            let result = document.getElementById("fill");
+            let myresult = document.createElement("tr");
+            
+            myresult.innerHTML = `
+                <td>${counter}</td>
+                <td>${fullname}</td>
+                <td>${test}</td>
+                <td>${exam}</td>
+                <td>${sum}</td>
+                <td>${average}</td>
+                <td>${percentage}</td>
+                <td>${position}</td>
+                <td><button class="clear-btn" onclick="this.closest('tr').remove(); saveTable(); updatePositions();">clear</button></td>
+            `;
+            
+            result.appendChild(myresult);
+            
+            updatePositions();
+            saveTable();
+            counter++;
+            
+            
+            document.getElementById("fullname").value = "";
+            document.getElementById("numberone").value = "";
+            document.getElementById("numbertwo").value = "";
+        }
+
+        function updatePositions() {
+            let tbody = document.getElementById("fill");
+            let rows = Array.from(tbody.rows);
+
+            
+            rows.sort((a, b) => {
+                let sumA = parseFloat(a.cells[4].innerText) || 0; 
+                let sumB = parseFloat(b.cells[4].innerText) || 0;
+                return sumB - sumA; 
+            });
+
+            tbody.innerHTML = "";
+
+            rows.forEach((row, index) => {
+                row.cells[0].innerText = index + 1; // Re-index Serial Number
+                row.cells[7].innerText = index + 1; // Re-index Position based on high score
+                tbody.appendChild(row);
+            });
+        }
+
+        function saveTable() {
+            localStorage.setItem("studentResults", document.getElementById("fill").innerHTML);
+        }
+    </script>
+</body>
+</html>
+
