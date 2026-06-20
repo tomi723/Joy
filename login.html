@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <style>
+  body{
+    margin:0;
+    height:auto;
+    justify-content:flex-start;
+    overflow: hidden;
+    display: flex;
+    align-contents:center;
+    flex-direction:column;
+    background:SkyBlue;
+  }
+  </style>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>Hello, World!</title>
+</head>
+<body>
+  <center><h1>SEVENTHDAY ADVENTIST LOGIN PAGE
+    </h1></center>
+  <input type="text" id="username" placeholder="enter your username" required> 
+    <input type="text" id="password" placeholder="enter your password" required>
+  <button onclick="login()">Login</button>
+  
+  <script>
+  function login(){
+    let username= document.getElementById("username").value;
+    let password= document.getElementById("password").value;
+    
+    if (username==="myadmin" && password==="12345"){
+     
+      window.location.href="job.html"
+    }
+      else{
+      alert("Enter the correct username and password")
+      }
+    
+  }
+  </script>
+</body>
+</html>
+
